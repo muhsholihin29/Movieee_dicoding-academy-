@@ -6,14 +6,17 @@
 //
 
 import Foundation
+import RealmSwift
 
 final class Injection: NSObject {
     
-    private func provideRepository() -> MovieTvRepository {
+    private func provideRepository() -> MovieTvRepositoryProtocol {
         
+        let realm = try? Realm()
+        let local: LocalDataSource = LocalDataSource.sharedInstance(realm)
         let remote: RemoteDataSource = RemoteDataSource.sharedInstance
         
-        return MovieTvRepository.sharedInstance(remote)
+        return MovieTvRepository.sharedInstance(local, remote)
     }
     
     func provideMovie() -> MovieUseCase {

@@ -8,6 +8,8 @@
 import Foundation
 
 protocol MovieUseCase {
+    func getMovies(type: MovieType.RawValue, completion: @escaping (Result<[Movie], Error>) -> Void)
+        
     func getPopularMovies(completion: @escaping (Result<[Movie], Error>) -> Void)
     func getTopRatedMovies(completion: @escaping (Result<[Movie], Error>) -> Void)
     func getNowPlayingMovies(completion: @escaping (Result<[Movie], Error>) -> Void)
@@ -20,6 +22,12 @@ class MovieInteractor: MovieUseCase {
     
     required init(repository: MovieTvRepositoryProtocol) {
         self.repository = repository
+    }
+    
+    func getMovies(type: MovieType.RawValue, completion: @escaping (Result<[Movie], Error>) -> Void) {
+        repository.getMovies(type: type) { result in
+            completion(result)
+        }
     }
     
     func getPopularMovies(completion: @escaping (Result<[Movie], Error>) -> Void) {

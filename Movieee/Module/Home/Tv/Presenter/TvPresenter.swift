@@ -31,7 +31,7 @@ class TvPresenter: ObservableObject {
     func getPopularTv() {
         self.loadingState = true
         
-        tvUseCase.getPopularTv { result in
+        tvUseCase.getTvs(type: TvType.POPULAR.rawValue) { result in
             switch result {
             case .success(let tv):
                 DispatchQueue.main.async {
@@ -49,7 +49,7 @@ class TvPresenter: ObservableObject {
     func getTopRatedTv() {
         self.loadingState = true
         
-        tvUseCase.getTopRatedTv { result in
+        tvUseCase.getTvs(type: TvType.TOP_RATED.rawValue) { result in
             switch result {
             case .success(let tv):
                 DispatchQueue.main.async {
@@ -66,7 +66,7 @@ class TvPresenter: ObservableObject {
     
     func getAiringTodayTv() {
         
-        tvUseCase.getAiringTodayTv { result in
+        tvUseCase.getTvs(type: TvType.AIRING_TODAY.rawValue) { result in
             switch result {
             case .success(let tv):
                 DispatchQueue.main.async {
@@ -83,7 +83,7 @@ class TvPresenter: ObservableObject {
     
     func getOnTheAirTv() {
         
-        tvUseCase.getOnTheAirTv { result in
+        tvUseCase.getTvs(type: TvType.ON_THE_AIR.rawValue) { result in
             switch result {
             case .success(let tv):
                 DispatchQueue.main.async {

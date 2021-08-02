@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RealmSwift
 
 final class DataMapper {
     
@@ -194,5 +195,97 @@ final class DataMapper {
             voteAverage: detail.voteAverage ?? 0,
             voteCount: detail.voteCount ?? 0
         )
+    }
+    
+    static func mapMovieEntityToDomain(
+        input movieResultResponse: [MovieEntity]
+    ) -> [Movie] {
+        return movieResultResponse.map { result in
+            return Movie(
+                adult: result.adult ,
+                backdropPath: result.backdropPath ,
+                genreIDS: Array(result.genreIDS),
+                id: result.movieId,
+                originalLanguage: result.originalLanguage,
+                originalTitle: result.originalTitle,
+                overview: result.overview,
+                popularity: result.popularity,
+                posterPath: result.posterPath,
+                releaseDate: result.releaseDate,
+                title: result.title,
+                video: result.video,
+                voteAverage: result.voteAverage,
+                voteCount: result.voteCount
+            )
+        }
+    }
+    
+    static func mapTvEntityToDomain(
+        input tvResultResponses: [TvEntity]
+    ) -> [Tv] {
+        
+        return tvResultResponses.map { result in
+            return Tv(
+                backdropPath: result.backdropPath,
+                firstAirDate: result.firstAirDate,
+                genreIDS: Array(result.genreIDS),
+                id: result.id,
+                name: result.name,
+                originCountry: Array(result.originCountry),
+                originalLanguage: result.originalLanguage,
+                originalName: result.originalName,
+                overview: result.overview,
+                popularity: result.popularity,
+                posterPath: result.posterPath,
+                voteAverage: result.voteAverage,
+                voteCount: result.voteCount
+            )
+        }
+    }
+    
+    static func mapMovieResponseToEntity(
+        input movieResultResponse: [MovieResponse.Result]
+    ) -> [MovieEntity] {
+        return movieResultResponse.map { result in
+            let entity = MovieEntity()
+            entity.adult = result.adult ?? false
+            entity.backdropPath = result.backdropPath ?? ""
+            entity.genreIDS.append(objectsIn: result.genreIDS ?? [])
+            entity.movieId = result.id
+            entity.originalLanguage = result.originalLanguage ?? ""
+            entity.originalTitle = result.originalTitle ?? ""
+            entity.overview = result.overview ?? ""
+            entity.popularity = result.popularity ?? 0
+            entity.posterPath = result.posterPath ?? ""
+            entity.releaseDate = result.releaseDate ?? ""
+            entity.title = result.title ?? ""
+            entity.video = result.video ?? false
+            entity.voteAverage = result.voteAverage ?? 0
+            entity.voteCount = result.voteCount ?? 0
+            return entity
+        }
+    }
+    
+    static func mapTvResponseToEntity(
+        input tvResultResponses: [TvResponse.Result]
+    ) -> [TvEntity] {
+        
+        return tvResultResponses.map { result in
+            let entity = TvEntity()
+            entity.backdropPath = result.backdropPath ?? ""
+            entity.firstAirDate = result.firstAirDate ?? ""
+            entity.genreIDS.append(objectsIn: result.genreIDS ?? [])
+            entity.tvId = result.id
+            entity.name = result.name ?? ""
+            entity.originCountry.append(objectsIn: result.originCountry ?? [])
+            entity.originalLanguage = result.originalLanguage ?? ""
+            entity.originalName = result.originalName ?? ""
+            entity.overview = result.overview ?? ""
+            entity.popularity = result.popularity ?? 0
+            entity.posterPath = result.posterPath ?? ""
+            entity.voteAverage = result.voteAverage ?? 0
+            entity.voteCount = result.voteCount ?? 0
+            return entity
+        }
     }
 }

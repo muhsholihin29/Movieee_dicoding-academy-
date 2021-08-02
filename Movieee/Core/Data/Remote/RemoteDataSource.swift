@@ -8,7 +8,9 @@
 import Foundation
 import Alamofire
 
-protocol RemoteDataSourceProtocol: class {
+protocol RemoteDataSourceProtocol: AnyObject {
+    
+    func getMovies(type: MovieType.RawValue, result: @escaping (Result<[MovieResponse.Result], URLError>) -> Void)
     
     func getPopularMovies(result: @escaping (Result<[MovieResponse.Result], URLError>) -> Void)
     func getTopRatedMovies(result: @escaping (Result<[MovieResponse.Result], URLError>) -> Void)
@@ -33,6 +35,33 @@ final class RemoteDataSource: NSObject {
 }
 
 extension RemoteDataSource: RemoteDataSourceProtocol {
+    
+    func getMovies(type: MovieType.RawValue, result: @escaping (Result<[MovieResponse.Result], URLError>) -> Void){
+        var endpoint = ""
+        switch type {
+        case MovieType.POPULAR.rawValue:
+            endpoint = Endpoints.Gets.popularMovies.url
+        case MovieType.TOP_RATED.rawValue:
+            endpoint = Endpoints.Gets.topRatedMovies.url
+        case MovieType.UPCOMING.rawValue:
+            endpoint = Endpoints.Gets.upcomingMovies.url
+        case MovieType.NOW_PLAYING.rawValue:
+            endpoint = Endpoints.Gets.nowPlayingMovies.url
+        default:
+            endpoint = Endpoints.Gets.popularMovies.url
+        }
+        
+        guard let url = URL(string: endpoint) else { return }
+        
+        AF.request(url).validate().responseDecodable(of: MovieResponse.self) { response in
+            switch response.result {
+            case .success(let value):
+                result(.success(value.results))
+            case .failure:
+                result(.failure(.invalidResponse))
+            }
+        }
+    }
     
     func getPopularMovies(result: @escaping (Result<[MovieResponse.Result], URLError>) -> Void) {
         guard let url = URL(string: Endpoints.Gets.popularMovies.url) else { return }
@@ -97,6 +126,33 @@ extension RemoteDataSource: RemoteDataSourceProtocol {
             switch response.result {
             case .success(let value):
                 result(.success(value))
+            case .failure:
+                result(.failure(.invalidResponse))
+            }
+        }
+    }
+    
+    func getTvs(type: TvType.RawValue, result: @escaping (Result<[TvResponse.Result], URLError>) -> Void){
+        var endpoint = ""
+        switch type {
+        case TvType.POPULAR.rawValue:
+            endpoint = Endpoints.Gets.popularTv.url
+        case TvType.TOP_RATED.rawValue:
+            endpoint = Endpoints.Gets.topRatedTv.url
+        case TvType.ON_THE_AIR.rawValue:
+            endpoint = Endpoints.Gets.onTheAirTv.url
+        case TvType.AIRING_TODAY.rawValue:
+            endpoint = Endpoints.Gets.airingTodayTv.url
+        default:
+            endpoint = Endpoints.Gets.popularTv.url
+        }
+        
+        guard let url = URL(string: endpoint) else { return }
+        
+        AF.request(url).validate().responseDecodable(of: TvResponse.self) { response in
+            switch response.result {
+            case .success(let value):
+                result(.success(value.results))
             case .failure:
                 result(.failure(.invalidResponse))
             }

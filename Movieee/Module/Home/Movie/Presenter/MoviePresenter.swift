@@ -31,7 +31,7 @@ class MoviePresenter: ObservableObject {
     func getPopularMovies() {
         self.loadingState = true
         
-        movieUseCase.getPopularMovies { result in
+        movieUseCase.getMovies(type: MovieType.POPULAR.rawValue) { result in
             switch result {
             case .success(let movies):
                 DispatchQueue.main.async {
@@ -48,7 +48,7 @@ class MoviePresenter: ObservableObject {
     
     func getTopRatedMovies() {
         
-        movieUseCase.getTopRatedMovies { result in
+        movieUseCase.getMovies(type: MovieType.TOP_RATED.rawValue) { result in
             switch result {
             case .success(let movies):
                 DispatchQueue.main.async {
@@ -65,7 +65,7 @@ class MoviePresenter: ObservableObject {
     
     func getNowPlayingMovies() {
         
-        movieUseCase.getNowPlayingMovies { result in
+        movieUseCase.getMovies(type: MovieType.NOW_PLAYING.rawValue) { result in
             switch result {
             case .success(let movies):
                 DispatchQueue.main.async {
@@ -82,7 +82,7 @@ class MoviePresenter: ObservableObject {
     
     func getUpcomingMovies() {
         
-        movieUseCase.getUpcomingMovies { result in
+        movieUseCase.getMovies(type: MovieType.UPCOMING.rawValue) { result in
             switch result {
             case .success(let movies):
                 DispatchQueue.main.async {

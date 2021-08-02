@@ -8,6 +8,8 @@
 import Foundation
 
 protocol TvUseCase {
+    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void) 
+        
     func getPopularTv(completion: @escaping (Result<[Tv], Error>) -> Void)
     func getTopRatedTv(completion: @escaping (Result<[Tv], Error>) -> Void)
     func getOnTheAirTv(completion: @escaping (Result<[Tv], Error>) -> Void)
@@ -20,6 +22,12 @@ class TvInteractor: TvUseCase {
     
     required init(repository: MovieTvRepositoryProtocol) {
         self.repository = repository
+    }
+    
+    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void) {
+        repository.getTvs(type: type) { result in
+            completion(result)
+        }
     }
     
     func getPopularTv(completion: @escaping (Result<[Tv], Error>) -> Void) {
