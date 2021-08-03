@@ -36,6 +36,7 @@ class TvPresenter: ObservableObject {
             case .success(let tv):
                 DispatchQueue.main.async {
                     self.tv[0] = tv
+                    print("mytag \(tv[0].id)")
                 }
             case .failure(let error):
                 DispatchQueue.main.async {

@@ -54,6 +54,8 @@
 		CFB6AC8C26AFBFDC005237CC /* DetailTv.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB6AC8B26AFBFDC005237CC /* DetailTv.swift */; };
 		CFB6AC8E26AFBFFA005237CC /* DetailMovie.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB6AC8D26AFBFFA005237CC /* DetailMovie.swift */; };
 		CFBC026526B7DD1D00640517 /* TvEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBC026426B7DD1D00640517 /* TvEntity.swift */; };
+		CFBC026726B85CD900640517 /* DetailMovieEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBC026626B85CD900640517 /* DetailMovieEntity.swift */; };
+		CFBC026926B860A800640517 /* DetailTvEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFBC026826B860A800640517 /* DetailTvEntity.swift */; };
 		CFD0CC2726B3110800A3D390 /* MovieTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD0CC2626B3110800A3D390 /* MovieTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
@@ -125,6 +127,8 @@
 		CFB6AC8B26AFBFDC005237CC /* DetailTv.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTv.swift; sourceTree = "<group>"; };
 		CFB6AC8D26AFBFFA005237CC /* DetailMovie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMovie.swift; sourceTree = "<group>"; };
 		CFBC026426B7DD1D00640517 /* TvEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvEntity.swift; sourceTree = "<group>"; };
+		CFBC026626B85CD900640517 /* DetailMovieEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailMovieEntity.swift; sourceTree = "<group>"; };
+		CFBC026826B860A800640517 /* DetailTvEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTvEntity.swift; sourceTree = "<group>"; };
 		CFD0CC2626B3110800A3D390 /* MovieTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -179,6 +183,8 @@
 			children = (
 				CF40CB4626B6E27B008DDA1D /* MovieEntity.swift */,
 				CFBC026426B7DD1D00640517 /* TvEntity.swift */,
+				CFBC026626B85CD900640517 /* DetailMovieEntity.swift */,
+				CFBC026826B860A800640517 /* DetailTvEntity.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -622,6 +628,7 @@
 			files = (
 				CF5B9D3826B0428000E8F27C /* MoviePresenter.swift in Sources */,
 				CF8B929F269B3978009A39D8 /* TvResponse.swift in Sources */,
+				CFBC026726B85CD900640517 /* DetailMovieEntity.swift in Sources */,
 				CFD0CC2726B3110800A3D390 /* MovieTableViewCell.swift in Sources */,
 				CF5B9D4126B06F7400E8F27C /* TvViewController.swift in Sources */,
 				CF8B9260269B0C03009A39D8 /* ViewController.swift in Sources */,
@@ -640,6 +647,7 @@
 				CF9F68AB26AEED04002599C5 /* Movie.swift in Sources */,
 				CF9F68A926AEEC36002599C5 /* DataMapper.swift in Sources */,
 				CFB6AC8626AF8623005237CC /* MovieInteractor.swift in Sources */,
+				CFBC026926B860A800640517 /* DetailTvEntity.swift in Sources */,
 				CF9F68B026AEF493002599C5 /* CustomeError+Ext.swift in Sources */,
 				CF8B92A1269B399B009A39D8 /* RemoteDataSource.swift in Sources */,
 				CFB6AC8826AF93AF005237CC /* DetailMovieResponse.swift in Sources */,

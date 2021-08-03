@@ -8,12 +8,7 @@
 import Foundation
 
 protocol TvUseCase {
-    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void) 
-        
-    func getPopularTv(completion: @escaping (Result<[Tv], Error>) -> Void)
-    func getTopRatedTv(completion: @escaping (Result<[Tv], Error>) -> Void)
-    func getOnTheAirTv(completion: @escaping (Result<[Tv], Error>) -> Void)
-    func getAiringTodayTv(completion: @escaping (Result<[Tv], Error>) -> Void)
+    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void)
 }
 
 class TvInteractor: TvUseCase {
@@ -29,31 +24,5 @@ class TvInteractor: TvUseCase {
             completion(result)
         }
     }
-    
-    func getPopularTv(completion: @escaping (Result<[Tv], Error>) -> Void) {
-        repository.getPopularTv() { result in
-            completion(result)
-        }
-    }
-    
-    func getTopRatedTv(completion: @escaping (Result<[Tv], Error>) -> Void) {
-        repository.getTopRatedTv() { result in
-            completion(result)
-        }
-    }
-    
-    func getOnTheAirTv(completion: @escaping (Result<[Tv], Error>) -> Void) {
-        repository.getOnTheAirTv() { result in
-            completion(result)
-        }
-    }
-    
-    func getAiringTodayTv(completion: @escaping (Result<[Tv], Error>) -> Void) {
-        repository.getAiringTodayTv() { result in
-            completion(result)
-        }
-    }
-    
-    
 }
 

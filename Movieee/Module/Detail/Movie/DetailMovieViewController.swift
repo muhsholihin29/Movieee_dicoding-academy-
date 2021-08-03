@@ -46,7 +46,7 @@ class DetailMovieViewController: UIViewController {
     private func setUI(){
         self.titleLabel.text = movie?.originalTitle
         self.releasedLabel.text = movie?.releaseDate
-        self.genresLabel.text = movie?.genres?.map{ genre in
+        self.genresLabel.text = movie?.genres.map{ genre in
             return genre.name ?? ""
         }.joined(separator:", ")
         self.voteLabel.text = String(movie?.voteAverage ?? 0)

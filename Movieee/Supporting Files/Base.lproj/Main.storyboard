@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19134"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -230,11 +231,13 @@
             </objects>
             <point key="canvasLocation" x="-123" y="456"/>
         </scene>
-        <!--Home-->
+        <!--Movie-->
         <scene sceneID="y1X-Hg-a5H">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="6Gm-X6-0FV" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Home" image="homekit" catalog="system" id="PuG-TU-PFD"/>
+                    <tabBarItem key="tabBarItem" title="Movie" id="PuG-TU-PFD">
+                        <imageReference key="image" image="film" catalog="system"/>
+                    </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="DvV-rs-EBU">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -280,11 +283,13 @@
             </objects>
             <point key="canvasLocation" x="1726" y="800"/>
         </scene>
-        <!--About-->
+        <!--Tv Show-->
         <scene sceneID="F2m-w7-KdL">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Q8c-gM-YRs" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="About" image="info" catalog="system" id="Uk3-74-Szq"/>
+                    <tabBarItem key="tabBarItem" title="Tv Show" id="Uk3-74-Szq">
+                        <imageReference key="image" image="photo.tv" catalog="system"/>
+                    </tabBarItem>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="AMr-bX-LEg">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
@@ -472,8 +477,8 @@
         </scene>
     </scenes>
     <resources>
-        <image name="homekit" catalog="system" width="128" height="106"/>
-        <image name="info" catalog="system" width="93" height="128"/>
+        <image name="film" catalog="system" width="128" height="93"/>
+        <image name="photo.tv" catalog="system" width="128" height="97"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

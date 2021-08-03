@@ -17,10 +17,22 @@ protocol LocalDataSourceProtocol: AnyObject {
         result: @escaping (Result<Bool, DatabaseError>) -> Void
     )
     
+    func getDetailMovie(id: Int, result: @escaping (Result<[DetailMovieEntity], DatabaseError>) -> Void)
+    func addDetailMovie(
+        movie: DetailMovieEntity,
+        result: @escaping (Result<Bool, DatabaseError>) -> Void
+    )
+    
     func getTvs(type: TvType.RawValue, result: @escaping (Result<[TvEntity], DatabaseError>) -> Void)
     func addTvs(
         tvs: [TvEntity],
         type: MovieType.RawValue,
+        result: @escaping (Result<Bool, DatabaseError>) -> Void
+    )
+    
+    func getDetailTv(id: Int, result: @escaping (Result<[DetailTvEntity], DatabaseError>) -> Void)
+    func addDetailTv(
+        tv: DetailTvEntity,
         result: @escaping (Result<Bool, DatabaseError>) -> Void
     )
 }
@@ -38,6 +50,8 @@ final class LocalDataSource: NSObject {
 }
 
 extension LocalDataSource: LocalDataSourceProtocol {
+   
+    
     
     func getMovies(
         type: MovieType.RawValue,
@@ -76,6 +90,32 @@ extension LocalDataSource: LocalDataSourceProtocol {
             result(.failure(.invalidInstance))
         }
     }
+    func getDetailMovie(id: Int, result: @escaping (Result<[DetailMovieEntity], DatabaseError>) -> Void) {
+        if let realm = realm {
+            let categories: Results<DetailMovieEntity> = {
+                realm.objects(DetailMovieEntity.self)
+                    .filter("movieId = \(id)")
+            }()
+            result(.success(categories.toArray(ofType: DetailMovieEntity.self)))
+        } else {
+            result(.failure(.invalidInstance))
+        }
+    }
+    
+    func addDetailMovie(movie: DetailMovieEntity, result: @escaping (Result<Bool, DatabaseError>) -> Void) {
+        if let realm = realm {
+            do {
+                try realm.write {
+                    realm.add(movie, update: .all)
+                    result(.success(true))
+                }
+            } catch {
+                result(.failure(.requestFailed))
+            }
+        } else {
+            result(.failure(.invalidInstance))
+        }
+    }
     
     func getTvs(type: TvType.RawValue, result: @escaping (Result<[TvEntity], DatabaseError>) -> Void) {
         if let realm = realm {
@@ -98,6 +138,33 @@ extension LocalDataSource: LocalDataSourceProtocol {
                         tv.setup(type: type)
                         realm.add(tv, update: .all)
                     }
+                    result(.success(true))
+                }
+            } catch {
+                result(.failure(.requestFailed))
+            }
+        } else {
+            result(.failure(.invalidInstance))
+        }
+    }
+    
+    func getDetailTv(id: Int, result: @escaping (Result<[DetailTvEntity], DatabaseError>) -> Void) {
+        if let realm = realm {
+            let categories: Results<DetailTvEntity> = {
+                realm.objects(DetailTvEntity.self)
+                    .filter("tvId = \(id)")
+            }()
+            result(.success(categories.toArray(ofType: DetailTvEntity.self)))
+        } else {
+            result(.failure(.invalidInstance))
+        }
+    }
+    
+    func addDetailTv(tv: DetailTvEntity, result: @escaping (Result<Bool, DatabaseError>) -> Void) {
+        if let realm = realm {
+            do {
+                try realm.write {
+                    realm.add(tv, update: .all)
                     result(.success(true))
                 }
             } catch {

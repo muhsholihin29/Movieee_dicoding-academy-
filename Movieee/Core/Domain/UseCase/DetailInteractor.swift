@@ -21,7 +21,7 @@ class DetailInteractor: DetailUseCase {
     }
     
     func getDetailMovie(id: Int, completion: @escaping (Result<DetailMovie, Error>) -> Void) {
-        repository.getDetailMovies(id: id) { result in
+        repository.getDetailMovie(id: id) { result in
             completion(result)
         }
     }

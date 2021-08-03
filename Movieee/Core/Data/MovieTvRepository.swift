@@ -9,19 +9,9 @@ import Foundation
 
 protocol MovieTvRepositoryProtocol {
     func getMovies(type: MovieType.RawValue, result: @escaping (Result<[Movie], Error>) -> Void)
-    
-    func getPopularMovies(result: @escaping (Result<[Movie], Error>) -> Void)
-    func getTopRatedMovies(result: @escaping (Result<[Movie], Error>) -> Void)
-    func getNowPlayingMovies(result: @escaping (Result<[Movie], Error>) -> Void)
-    func getUpcomingMovies(result: @escaping (Result<[Movie], Error>) -> Void)
-    func getDetailMovies(id: Int, result: @escaping (Result<DetailMovie, Error>) -> Void)
+    func getDetailMovie(id: Int, result: @escaping (Result<DetailMovie, Error>) -> Void)
     
     func getTvs(type: TvType.RawValue, result: @escaping (Result<[Tv], Error>) -> Void)
-    
-    func getPopularTv(result: @escaping (Result<[Tv], Error>) -> Void)
-    func getTopRatedTv(result: @escaping (Result<[Tv], Error>) -> Void)
-    func getOnTheAirTv(result: @escaping (Result<[Tv], Error>) -> Void)
-    func getAiringTodayTv(result: @escaping (Result<[Tv], Error>) -> Void)
     func getDetailTv(id: Int, result: @escaping (Result<DetailTv, Error>) -> Void)
 }
 
@@ -84,67 +74,43 @@ extension MovieTvRepository: MovieTvRepositoryProtocol {
         }
     }
     
-    func getPopularMovies(result: @escaping (Result<[Movie], Error>) -> Void){
-        self.remote.getPopularMovies { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapMovieResponseToDomain(input: responses)
-                result(.success(resultList))
+    func getDetailMovie(id: Int, result: @escaping (Result<DetailMovie, Error>) -> Void){
+        local.getDetailMovie(id: id) { localeResponses in
+            switch localeResponses {
+            case .success(let detailMovieEntity):
+                if detailMovieEntity.isEmpty {
+                    self.remote.getDetailMovie(id: id) { remoteResponses in
+                        switch remoteResponses {
+                        case .success(let detailMovieResponse):
+                            let detailMovieEntity = DataMapper.mapDetailMovieResponseToEntity(input: detailMovieResponse)
+                            self.local.addDetailMovie(movie: detailMovieEntity) { addState in
+                                switch addState {
+                                case .success(let resultFromAdd):
+                                    if resultFromAdd {
+                                        self.local.getDetailMovie(id: id) { localeResponses in
+                                            switch localeResponses {
+                                            case .success(let movieEntity):
+                                                let resultList = DataMapper.mapDetailMovieEntityToDomain(input: movieEntity[0])
+                                                result(.success(resultList))
+                                            case .failure(let error):
+                                                result(.failure(error))
+                                            }
+                                        }
+                                    }
+                                case .failure(let error):
+                                    result(.failure(error))
+                                }
+                            }
+                        case .failure(let error):
+                            result(.failure(error))
+                        }
+                    }
+                } else {
+                    let movieList = DataMapper.mapDetailMovieEntityToDomain(input: detailMovieEntity[0])
+                    result(.success(movieList))
+                }
             case .failure(let error):
                 result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getTopRatedMovies(result: @escaping (Result<[Movie], Error>) -> Void) {
-        self.remote.getTopRatedMovies { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapMovieResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getNowPlayingMovies(result: @escaping (Result<[Movie], Error>) -> Void) {
-        self.remote.getNowPlayingMovies { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapMovieResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getUpcomingMovies(result: @escaping (Result<[Movie], Error>) -> Void) {
-        self.remote.getUpcomingMovies { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapMovieResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getDetailMovies(id: Int, result: @escaping (Result<DetailMovie, Error>) -> Void){
-        self.remote.getDetailMovie(id: id) { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultData = DataMapper.mapDetailMovieResponseToDomain(input: responses)
-                result(.success(resultData))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
             }
         }
     }
@@ -190,70 +156,44 @@ extension MovieTvRepository: MovieTvRepositoryProtocol {
         }
     }
     
-    func getPopularTv(result: @escaping (Result<[Tv], Error>) -> Void) {
-        self.remote.getPopularTv { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapTvResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getTopRatedTv(result: @escaping (Result<[Tv], Error>) -> Void) {
-        self.remote.getTopRatedTv { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapTvResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getOnTheAirTv(result: @escaping (Result<[Tv], Error>) -> Void) {
-        self.remote.getOnTheAirTv { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapTvResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
-    func getAiringTodayTv(result: @escaping (Result<[Tv], Error>) -> Void) {
-        self.remote.getAiringTodayTv { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultList = DataMapper.mapTvResponseToDomain(input: responses)
-                result(.success(resultList))
-            case .failure(let error):
-                result(.failure(error))
-                print(error)
-            }
-        }
-    }
-    
     func getDetailTv(id: Int, result: @escaping (Result<DetailTv, Error>) -> Void){
-        self.remote.getDetailTv(id: id) { remoteResponses in
-            switch remoteResponses {
-            case .success(let responses):
-                let resultData = DataMapper.mapDetailTvResponseToDomain(input: responses)
-                result(.success(resultData))
+        local.getDetailTv(id: id) { localeResponses in
+            switch localeResponses {
+            case .success(let detailTvEntity):
+                if detailTvEntity.isEmpty {
+                    self.remote.getDetailTv(id: id) { remoteResponses in
+                        switch remoteResponses {
+                        case .success(let detailTvResponse):
+                            let detailTvEntity = DataMapper.mapDetailTvResponseToEntity(input: detailTvResponse)
+                            self.local.addDetailTv(tv: detailTvEntity) { addState in
+                                switch addState {
+                                case .success(let resultFromAdd):
+                                    if resultFromAdd {
+                                        self.local.getDetailTv(id: id) { localeResponses in
+                                            switch localeResponses {
+                                            case .success(let tvEntity):
+                                                let resultList = DataMapper.mapDetailTvEntityToDomain(input: tvEntity[0])
+                                                result(.success(resultList))
+                                            case .failure(let error):
+                                                result(.failure(error))
+                                            }
+                                        }
+                                    }
+                                case .failure(let error):
+                                    result(.failure(error))
+                                }
+                            }
+                        case .failure(let error):
+                            result(.failure(error))
+                        }
+                    }
+                } else {
+                    let movieList = DataMapper.mapDetailTvEntityToDomain(input: detailTvEntity[0])
+                    result(.success(movieList))
+                }
             case .failure(let error):
                 result(.failure(error))
-                print(error)
             }
         }
     }
-    
-    
 }

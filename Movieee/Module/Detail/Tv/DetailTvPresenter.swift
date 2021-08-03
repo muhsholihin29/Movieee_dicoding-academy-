@@ -42,7 +42,7 @@ class DetailTvPresenter: ObservableObject {
                 DispatchQueue.main.async {
                     self.loadingState = false
                     self.errorMessage = error.localizedDescription
-                    print("errooor")
+                    print("errooor \(self.errorMessage)")
                 }
             }
         }
