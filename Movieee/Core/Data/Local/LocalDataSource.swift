@@ -7,34 +7,21 @@
 
 import Foundation
 import RealmSwift
+import RxSwift
 
 protocol LocalDataSourceProtocol: AnyObject {
     
-    func getMovies(type: MovieType.RawValue, result: @escaping (Result<[MovieEntity], DatabaseError>) -> Void)
-    func addMovies(
-        movies: [MovieEntity],
-        type: MovieType.RawValue,
-        result: @escaping (Result<Bool, DatabaseError>) -> Void
-    )
+    func getMovies(type: MovieType.RawValue) -> Observable<[MovieEntity]>
+    func addMovies(movies: [MovieEntity], type: MovieType.RawValue) -> Observable<Bool>
     
-    func getDetailMovie(id: Int, result: @escaping (Result<[DetailMovieEntity], DatabaseError>) -> Void)
-    func addDetailMovie(
-        movie: DetailMovieEntity,
-        result: @escaping (Result<Bool, DatabaseError>) -> Void
-    )
+    func getDetailMovie(id: Int) -> Observable<[DetailMovieEntity]>
+    func addDetailMovie(movie: DetailMovieEntity) -> Observable<Bool>
     
-    func getTvs(type: TvType.RawValue, result: @escaping (Result<[TvEntity], DatabaseError>) -> Void)
-    func addTvs(
-        tvs: [TvEntity],
-        type: MovieType.RawValue,
-        result: @escaping (Result<Bool, DatabaseError>) -> Void
-    )
+    func getTvs(type: TvType.RawValue) -> Observable<[TvEntity]>
+    func addTvs(tvs: [TvEntity],type: MovieType.RawValue) -> Observable<Bool>
     
-    func getDetailTv(id: Int, result: @escaping (Result<[DetailTvEntity], DatabaseError>) -> Void)
-    func addDetailTv(
-        tv: DetailTvEntity,
-        result: @escaping (Result<Bool, DatabaseError>) -> Void
-    )
+    func getDetailTv(id: Int) -> Observable<[DetailTvEntity]>
+    func addDetailTv(tv: DetailTvEntity) -> Observable<Bool>
 }
 
 final class LocalDataSource: NSObject {
@@ -46,132 +33,153 @@ final class LocalDataSource: NSObject {
     static let sharedInstance: (Realm?) -> LocalDataSource = {
         realmDatabase in return LocalDataSource(realm: realmDatabase)
     }
-    
 }
 
 extension LocalDataSource: LocalDataSourceProtocol {
-   
     
-    
-    func getMovies(
-        type: MovieType.RawValue,
-        result: @escaping (Result<[MovieEntity], DatabaseError>) -> Void
-    ) {
-        if let realm = realm {
-            let categories: Results<MovieEntity> = {
-                realm.objects(MovieEntity.self)
-                    .sorted(byKeyPath: "id", ascending: true)
-                    .filter("type = '\(type)'")
-            }()
-            result(.success(categories.toArray(ofType: MovieEntity.self)))
-        } else {
-            result(.failure(.invalidInstance))
+    func getMovies(type: MovieType.RawValue) -> Observable<[MovieEntity]> {
+        return Observable<[MovieEntity]>.create { observer in
+            if let realm = self.realm {
+                let categories: Results<MovieEntity> = {
+                    realm.objects(MovieEntity.self)
+                        .sorted(byKeyPath: "id", ascending: true)
+                        .filter("type = '\(type)'")
+                }()
+                observer.onNext(categories.toArray(ofType: MovieEntity.self))
+                observer.onCompleted()
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
+            }
+            return Disposables.create()
         }
     }
     
-    func addMovies(
-        movies: [MovieEntity],
-        type: MovieType.RawValue,
-        result: @escaping (Result<Bool, DatabaseError>) -> Void
-    ) {
-        if let realm = realm {
-            do {
-                try realm.write {
-                    for movie in movies {
-                        movie.setup(type: type)
+    func addMovies(movies: [MovieEntity], type: MovieType.RawValue) -> Observable<Bool> {
+        return Observable<Bool>.create { observer in
+            if let realm = self.realm {
+                do {
+                    try realm.write {
+                        for movie in movies {
+                            movie.setup(type: type)
+                            realm.add(movie, update: .all)
+                        }
+                        observer.onNext(true)
+                        observer.onCompleted()
+                    }
+                } catch {
+                    observer.onError(DatabaseError.requestFailed)
+                }
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
+            }
+            return Disposables.create()
+        }
+    }
+    func getDetailMovie(id: Int) -> Observable<[DetailMovieEntity]> {
+        return Observable<[DetailMovieEntity]>.create { observer in
+            if let realm = self.realm {
+                let categories: Results<DetailMovieEntity> = {
+                    realm.objects(DetailMovieEntity.self)
+                        .filter("movieId = \(id)")
+                }()
+                observer.onNext(categories.toArray(ofType: DetailMovieEntity.self))
+                observer.onCompleted()
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func addDetailMovie(movie: DetailMovieEntity) -> Observable<Bool> {
+        return Observable<Bool>.create { observer in
+            if let realm = self.realm {
+                do {
+                    try realm.write {
                         realm.add(movie, update: .all)
+                        observer.onNext(true)
+                        observer.onCompleted()
                     }
-                    result(.success(true))
+                } catch {
+                    observer.onError(DatabaseError.requestFailed)
                 }
-            } catch {
-                result(.failure(.requestFailed))
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
             }
-        } else {
-            result(.failure(.invalidInstance))
-        }
-    }
-    func getDetailMovie(id: Int, result: @escaping (Result<[DetailMovieEntity], DatabaseError>) -> Void) {
-        if let realm = realm {
-            let categories: Results<DetailMovieEntity> = {
-                realm.objects(DetailMovieEntity.self)
-                    .filter("movieId = \(id)")
-            }()
-            result(.success(categories.toArray(ofType: DetailMovieEntity.self)))
-        } else {
-            result(.failure(.invalidInstance))
+            return Disposables.create()
         }
     }
     
-    func addDetailMovie(movie: DetailMovieEntity, result: @escaping (Result<Bool, DatabaseError>) -> Void) {
-        if let realm = realm {
-            do {
-                try realm.write {
-                    realm.add(movie, update: .all)
-                    result(.success(true))
+    func getTvs(type: TvType.RawValue) -> Observable<[TvEntity]> {
+        return Observable<[TvEntity]>.create { observer in
+            if let realm = self.realm {
+                let categories: Results<TvEntity> = {
+                    realm.objects(TvEntity.self)
+                        .sorted(byKeyPath: "id", ascending: true)
+                        .filter("type = '\(type)'")
+                }()
+                observer.onNext(categories.toArray(ofType: TvEntity.self))
+                observer.onCompleted()
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func addTvs(tvs: [TvEntity], type: MovieType.RawValue) -> Observable<Bool> {
+        return Observable<Bool>.create { observer in
+            if let realm = self.realm {
+                do {
+                    try realm.write {
+                        for tv in tvs {
+                            tv.setup(type: type)
+                            realm.add(tv, update: .all)
+                        }
+                        observer.onNext(true)
+                        observer.onCompleted()
+                    }
+                } catch {
+                    observer.onError(DatabaseError.requestFailed)
                 }
-            } catch {
-                result(.failure(.requestFailed))
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
             }
-        } else {
-            result(.failure(.invalidInstance))
+            return Disposables.create()
         }
     }
     
-    func getTvs(type: TvType.RawValue, result: @escaping (Result<[TvEntity], DatabaseError>) -> Void) {
-        if let realm = realm {
-            let categories: Results<TvEntity> = {
-                realm.objects(TvEntity.self)
-                    .sorted(byKeyPath: "id", ascending: true)
-                    .filter("type = '\(type)'")
-            }()
-            result(.success(categories.toArray(ofType: TvEntity.self)))
-        } else {
-            result(.failure(.invalidInstance))
+    func getDetailTv(id: Int) -> Observable<[DetailTvEntity]> {
+        return Observable<[DetailTvEntity]>.create { observer in
+            if let realm = self.realm {
+                let categories: Results<DetailTvEntity> = {
+                    realm.objects(DetailTvEntity.self)
+                        .filter("tvId = \(id)")
+                }()
+                observer.onNext(categories.toArray(ofType: DetailTvEntity.self))
+                observer.onCompleted()
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
+            }
+            return Disposables.create()
         }
     }
     
-    func addTvs(tvs: [TvEntity], type: MovieType.RawValue, result: @escaping (Result<Bool, DatabaseError>) -> Void) {
-        if let realm = realm {
-            do {
-                try realm.write {
-                    for tv in tvs {
-                        tv.setup(type: type)
+    func addDetailTv(tv: DetailTvEntity) -> Observable<Bool> {
+        return Observable<Bool>.create { observer in
+            if let realm = self.realm {
+                do {
+                    try realm.write {
                         realm.add(tv, update: .all)
+                        observer.onNext(true)
                     }
-                    result(.success(true))
+                } catch {
+                    observer.onError(DatabaseError.requestFailed)
                 }
-            } catch {
-                result(.failure(.requestFailed))
+            } else {
+                observer.onError(DatabaseError.invalidInstance)
             }
-        } else {
-            result(.failure(.invalidInstance))
-        }
-    }
-    
-    func getDetailTv(id: Int, result: @escaping (Result<[DetailTvEntity], DatabaseError>) -> Void) {
-        if let realm = realm {
-            let categories: Results<DetailTvEntity> = {
-                realm.objects(DetailTvEntity.self)
-                    .filter("tvId = \(id)")
-            }()
-            result(.success(categories.toArray(ofType: DetailTvEntity.self)))
-        } else {
-            result(.failure(.invalidInstance))
-        }
-    }
-    
-    func addDetailTv(tv: DetailTvEntity, result: @escaping (Result<Bool, DatabaseError>) -> Void) {
-        if let realm = realm {
-            do {
-                try realm.write {
-                    realm.add(tv, update: .all)
-                    result(.success(true))
-                }
-            } catch {
-                result(.failure(.requestFailed))
-            }
-        } else {
-            result(.failure(.invalidInstance))
+            return Disposables.create()
         }
     }
     

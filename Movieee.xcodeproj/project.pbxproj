@@ -14,7 +14,6 @@
 		CF40CB4726B6E27B008DDA1D /* MovieEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF40CB4626B6E27B008DDA1D /* MovieEntity.swift */; };
 		CF40CB4926B6E28F008DDA1D /* LocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF40CB4826B6E28F008DDA1D /* LocalDataSource.swift */; };
 		CF5B9D2F26B024E800E8F27C /* Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D2E26B024E800E8F27C /* Injection.swift */; };
-		CF5B9D3126B0251300E8F27C /* DetailInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3026B0251300E8F27C /* DetailInteractor.swift */; };
 		CF5B9D3426B02A4D00E8F27C /* MovieViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3326B02A4D00E8F27C /* MovieViewController.swift */; };
 		CF5B9D3826B0428000E8F27C /* MoviePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3726B0428000E8F27C /* MoviePresenter.swift */; };
 		CF5B9D3D26B0662E00E8F27C /* TvInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3C26B0662E00E8F27C /* TvInteractor.swift */; };
@@ -46,6 +45,8 @@
 		CF9F68AB26AEED04002599C5 /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9F68AA26AEED04002599C5 /* Movie.swift */; };
 		CF9F68AD26AEEE56002599C5 /* Tv.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9F68AC26AEEE56002599C5 /* Tv.swift */; };
 		CF9F68B026AEF493002599C5 /* CustomeError+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF9F68AF26AEF493002599C5 /* CustomeError+Ext.swift */; };
+		CFA11EB926B9425100A94C2D /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = CFA11EB826B9425100A94C2D /* RxCocoa */; };
+		CFA11EBB26B9425100A94C2D /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = CFA11EBA26B9425100A94C2D /* RxSwift */; };
 		CFB1572526B41B2C006C4124 /* MovieTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CFB1572326B41B2C006C4124 /* MovieTableViewCell.xib */; };
 		CFB1572926B428D2006C4124 /* MovieCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = CFB1572726B428D2006C4124 /* MovieCollectionViewCell.xib */; };
 		CFB6AC8626AF8623005237CC /* MovieInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB6AC8526AF8623005237CC /* MovieInteractor.swift */; };
@@ -82,7 +83,6 @@
 		CF40CB4626B6E27B008DDA1D /* MovieEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieEntity.swift; sourceTree = "<group>"; };
 		CF40CB4826B6E28F008DDA1D /* LocalDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDataSource.swift; sourceTree = "<group>"; };
 		CF5B9D2E26B024E800E8F27C /* Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injection.swift; sourceTree = "<group>"; };
-		CF5B9D3026B0251300E8F27C /* DetailInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailInteractor.swift; sourceTree = "<group>"; };
 		CF5B9D3326B02A4D00E8F27C /* MovieViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewController.swift; sourceTree = "<group>"; };
 		CF5B9D3726B0428000E8F27C /* MoviePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviePresenter.swift; sourceTree = "<group>"; };
 		CF5B9D3C26B0662E00E8F27C /* TvInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvInteractor.swift; sourceTree = "<group>"; };
@@ -139,6 +139,8 @@
 			files = (
 				CF40CB4326B6DD30008DDA1D /* RealmSwift in Frameworks */,
 				CF40CB4126B6DD30008DDA1D /* Realm in Frameworks */,
+				CFA11EBB26B9425100A94C2D /* RxSwift in Frameworks */,
+				CFA11EB926B9425100A94C2D /* RxCocoa in Frameworks */,
 				CF8C1F3A26B5B57B0093CCA9 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -360,7 +362,6 @@
 			isa = PBXGroup;
 			children = (
 				CFB6AC8526AF8623005237CC /* MovieInteractor.swift */,
-				CF5B9D3026B0251300E8F27C /* DetailInteractor.swift */,
 				CF5B9D3C26B0662E00E8F27C /* TvInteractor.swift */,
 			);
 			path = UseCase;
@@ -503,6 +504,8 @@
 				CF8C1F3926B5B57B0093CCA9 /* Alamofire */,
 				CF40CB4026B6DD30008DDA1D /* Realm */,
 				CF40CB4226B6DD30008DDA1D /* RealmSwift */,
+				CFA11EB826B9425100A94C2D /* RxCocoa */,
+				CFA11EBA26B9425100A94C2D /* RxSwift */,
 			);
 			productName = Movieee;
 			productReference = CF8B9258269B0C03009A39D8 /* Movieee.app */;
@@ -578,6 +581,7 @@
 			packageReferences = (
 				CF8C1F3826B5B57B0093CCA9 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				CF40CB3F26B6DD30008DDA1D /* XCRemoteSwiftPackageReference "realm-cocoa" */,
+				CFA11EB726B9425100A94C2D /* XCRemoteSwiftPackageReference "RxSwift" */,
 			);
 			productRefGroup = CF8B9259269B0C03009A39D8 /* Products */;
 			projectDirPath = "";
@@ -642,7 +646,6 @@
 				CF8B925C269B0C03009A39D8 /* AppDelegate.swift in Sources */,
 				CFB6AC8A26AF991E005237CC /* DetailTvResponse.swift in Sources */,
 				CFB6AC8E26AFBFFA005237CC /* DetailMovie.swift in Sources */,
-				CF5B9D3126B0251300E8F27C /* DetailInteractor.swift in Sources */,
 				CFB6AC8C26AFBFDC005237CC /* DetailTv.swift in Sources */,
 				CF9F68AB26AEED04002599C5 /* Movie.swift in Sources */,
 				CF9F68A926AEEC36002599C5 /* DataMapper.swift in Sources */,
@@ -1008,6 +1011,14 @@
 				minimumVersion = 5.4.3;
 			};
 		};
+		CFA11EB726B9425100A94C2D /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1025,6 +1036,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CF8C1F3826B5B57B0093CCA9 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		CFA11EB826B9425100A94C2D /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CFA11EB726B9425100A94C2D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		CFA11EBA26B9425100A94C2D /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CFA11EB726B9425100A94C2D /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -6,14 +6,12 @@
 //
 
 import UIKit
-import Combine
 
 class TvViewController: UIViewController {
     
     @IBOutlet var tvTableView: UITableView!
     
     private var presenter: TvPresenter?
-    private var cancellables = Set<AnyCancellable>()
     private var tv: [[Tv]] = [[]]
     var categoryName = [String]()
     
@@ -26,7 +24,7 @@ class TvViewController: UIViewController {
         presenter?.getTopRatedTv()
         presenter?.getOnTheAirTv()
         presenter?.getAiringTodayTv()
-        self.observeTv()
+        
         self.navigationItem.title = "Tv Catalogue"
         
         categoryName.append("POPULAR TV")
@@ -38,19 +36,12 @@ class TvViewController: UIViewController {
         
         tvTableView.dataSource = self
         tvTableView.delegate = self
-    }
-    
-    private func observeTv() {
-        presenter?.objectWillChange
-            .sink { (_) in
-                DispatchQueue.main.async {
-                    if self.presenter?.loadingState == false {
-                        self.tv = self.presenter?.tv ?? [[]]
-                        self.tvTableView.reloadData()
-                    }
-                }
-            }
-            .store(in: &cancellables)
+        
+        if self.presenter?.loadingState == false {
+            self.tv = self.presenter?.tv ?? [[]]
+            self.tvTableView.reloadData()
+        }
+               
     }
 }
 

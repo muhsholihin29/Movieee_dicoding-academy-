@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol TvUseCase {
-    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void)
+    func getTvs(type: TvType.RawValue) -> Observable<[Tv]>
+    func getDetailTv(id: Int) -> Observable<[DetailTv]>
 }
 
 class TvInteractor: TvUseCase {
@@ -18,11 +20,13 @@ class TvInteractor: TvUseCase {
     required init(repository: MovieTvRepositoryProtocol) {
         self.repository = repository
     }
+
+    func getTvs(type: TvType.RawValue) -> Observable<[Tv]>  {
+        return repository.getTvs(type: type)
+    }
     
-    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void) {
-        repository.getTvs(type: type) { result in
-            completion(result)
-        }
+    func getDetailTv(id: Int) -> Observable<[DetailTv]>  {
+        return repository.getDetailTv(id: id)
     }
 }
 

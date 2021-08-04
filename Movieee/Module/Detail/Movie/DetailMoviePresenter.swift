@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import RxSwift
 
 class DetailMoviePresenter: ObservableObject {
-    let detailUseCase: DetailUseCase
+    let detailUseCase: MovieUseCase
     
     enum State {
         case isLoading
@@ -16,35 +17,30 @@ class DetailMoviePresenter: ObservableObject {
         case loaded
     }
     
-    
+    private let disposeBag = DisposeBag()
     @Published var detailMovie: DetailMovie?
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
     
     @Published private(set) var state = State.isLoading
     
-    init(detailUseCase: DetailUseCase) {
+    init(detailUseCase: MovieUseCase) {
         self.detailUseCase = detailUseCase
     }
     
     func getDetailMovie(id: Int) {
         self.loadingState = true
         
-        detailUseCase.getDetailMovie(id: id) { result in
-            switch result {
-            case .success(let movie):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
-                    self.loadingState = false
-                    self.detailMovie = movie
+        detailUseCase.getDetailMovie(id: id)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                if (!result.isEmpty){
+                    self.detailMovie = result.first
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+            } onError: { error in
+                self.errorMessage = error.localizedDescription
+            } onCompleted: {
+                self.loadingState = false
+            }.disposed(by: disposeBag)
     }
 }

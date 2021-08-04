@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-import Combine
 
 class DetailTvViewController: UIViewController {
     
@@ -20,7 +19,6 @@ class DetailTvViewController: UIViewController {
     @IBOutlet var posterImage: UIImageView!
     @IBOutlet var overviewLabel: UILabel!
     
-    private var cancellables = Set<AnyCancellable>()
     private var presenter: DetailTvPresenter?
     var tvId = 0
     private var tv: DetailTv?
@@ -29,19 +27,14 @@ class DetailTvViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let detailUseCase = Injection.init().provideDetail()
+        let detailUseCase = Injection.init().provideTv()
         presenter = DetailTvPresenter(detailUseCase: detailUseCase)
         presenter?.getDetailTv(id: tvId)
         
-        presenter?.objectWillChange
-            .sink { (_) in
-                DispatchQueue.main.async {
-                    if self.presenter?.loadingState == false {
-                        self.tv = self.presenter?.detailTv
-                        self.setUI()
-                    }
-                }
-            }.store(in: &cancellables)
+        if self.presenter?.loadingState == false {
+            self.tv = self.presenter?.detailTv
+            self.setUI()
+        }
     }
     
     private func setUI(){

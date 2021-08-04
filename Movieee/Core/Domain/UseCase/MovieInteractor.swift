@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol MovieUseCase {
-    func getMovies(type: MovieType.RawValue, completion: @escaping (Result<[Movie], Error>) -> Void)
+    func getMovies(type: MovieType.RawValue) -> Observable<[Movie]>
+    func getDetailMovie(id: Int) -> Observable<[DetailMovie]>
 }
 
 class MovieInteractor: MovieUseCase {
@@ -19,10 +21,12 @@ class MovieInteractor: MovieUseCase {
         self.repository = repository
     }
     
-    func getMovies(type: MovieType.RawValue, completion: @escaping (Result<[Movie], Error>) -> Void) {
-        repository.getMovies(type: type) { result in
-            completion(result)
-        }
+    func getMovies(type: MovieType.RawValue) -> Observable<[Movie]> {
+        return repository.getMovies(type: type)
+    }
+    
+    func getDetailMovie(id: Int) -> Observable<[DetailMovie]>  {
+        return repository.getDetailMovie(id: id)
     }
 }
 

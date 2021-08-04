@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import RxSwift
 
 class DetailTvPresenter: ObservableObject {
-    let detailUseCase: DetailUseCase
+    let detailUseCase: TvUseCase
     
     enum State {
         case isLoading
@@ -16,35 +17,30 @@ class DetailTvPresenter: ObservableObject {
         case loaded
     }
     
-    
+    private let disposeBag = DisposeBag()
     @Published var detailTv: DetailTv?
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
     
     @Published private(set) var state = State.isLoading
     
-    init(detailUseCase: DetailUseCase) {
+    init(detailUseCase: TvUseCase) {
         self.detailUseCase = detailUseCase
     }
     
     func getDetailTv(id: Int) {
         self.loadingState = true
         
-        detailUseCase.getDetailTv(id: id) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
-                    self.loadingState = false
-                    self.detailTv = tv
+        detailUseCase.getDetailTv(id: id)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                if (!result.isEmpty){
+                    self.detailTv = result.first
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor \(self.errorMessage)")
-                }
-            }
-        }
+            } onError: { error in
+                self.errorMessage = error.localizedDescription
+            } onCompleted: {
+                self.loadingState = false
+            }.disposed(by: disposeBag)
     }
 }

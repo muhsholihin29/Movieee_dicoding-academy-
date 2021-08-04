@@ -6,14 +6,14 @@
 //
 
 import UIKit
-import Combine
+import RxSwift
+import SwiftUI
 
 class MovieViewController: UIViewController {
     
     @IBOutlet var movieTableView: UITableView!
-    
+    private var disposeBag = DisposeBag()
     private var presenter: MoviePresenter?
-    private var cancellables = Set<AnyCancellable>()
     private var movies: [[Movie]] = [[]]
     var categoryName = [String]()
     
@@ -38,22 +38,34 @@ class MovieViewController: UIViewController {
         
         movieTableView.dataSource = self
         movieTableView.delegate = self
+        
+        
     }
     
+    
     private func observeMovie() {
-        presenter?.objectWillChange
-            .sink { (_) in
-                DispatchQueue.main.async {
-                    if self.presenter?.loadingState == false {
-                        self.movies = self.presenter?.movies ?? [[]]
-                        self.movieTableView.reloadData()
-                    }
-                }
-            }
-            .store(in: &cancellables)
+        self.presenter?.$state
+            .subscribe(onNext: { [weak self] state in
+                print("loadingggg")
+                self?.render(state)
+            })
+            .disposed(by: disposeBag)
+            
+    }
+    
+    private func render(_ state: MoviePresenter.State){
+        switch state {
+        case .isLoading:
+            print("loading")
+        case .failed:
+            print("failed")
+        case .loaded:
+            print("loaded")
+            self.movies = self.presenter?.movies ?? [[]]
+            self.movieTableView.reloadData()
     }
 }
-
+}
 extension MovieViewController: UITableViewDataSource, UITableViewDelegate {
     
     

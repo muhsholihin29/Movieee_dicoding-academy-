@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RxSwift
 
 class TvPresenter: ObservableObject {
     
@@ -17,7 +18,7 @@ class TvPresenter: ObservableObject {
         case loaded
     }
     
-    
+    private let disposeBag = DisposeBag()
     @Published var tv = [[Tv]](repeating: [], count: 4)
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
@@ -31,74 +32,53 @@ class TvPresenter: ObservableObject {
     func getPopularTv() {
         self.loadingState = true
         
-        tvUseCase.getTvs(type: TvType.POPULAR.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.tv[0] = tv
-                    print("mytag \(tv[0].id)")
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+        tvUseCase.getTvs(type: TvType.POPULAR.rawValue)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                self.tv[0] = result
+            } onError: { error in
+                self.errorMessage = error.localizedDescription
+            } onCompleted: {
+                
+            }.disposed(by: disposeBag)
     }
     
     func getTopRatedTv() {
-        self.loadingState = true
         
-        tvUseCase.getTvs(type: TvType.TOP_RATED.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.tv[1] = tv
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+        tvUseCase.getTvs(type: TvType.TOP_RATED.rawValue)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                self.tv[1] = result
+            } onError: { error in
+                self.errorMessage = error.localizedDescription
+            } onCompleted: {
+                
+            }.disposed(by: disposeBag)
     }
     
     func getAiringTodayTv() {
         
-        tvUseCase.getTvs(type: TvType.AIRING_TODAY.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.tv[2] = tv
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+        tvUseCase.getTvs(type: TvType.AIRING_TODAY.rawValue)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                self.tv[2] = result
+            } onError: { error in
+                self.errorMessage = error.localizedDescription
+            } onCompleted: {
+                
+            }.disposed(by: disposeBag)
     }
     
     func getOnTheAirTv() {
         
-        tvUseCase.getTvs(type: TvType.ON_THE_AIR.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
-                    self.loadingState = false
-                    self.tv[3] = tv
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+        tvUseCase.getTvs(type: TvType.ON_THE_AIR.rawValue)
+            .observe(on: MainScheduler.instance)
+            .subscribe { result in
+                self.tv[3] = result
+            } onError: { error in
+                self.errorMessage = error.localizedDescription
+            } onCompleted: {
+                self.loadingState = false
+            }.disposed(by: disposeBag)
     }
 }

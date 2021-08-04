@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Combine
 
 class DetailMovieViewController: UIViewController {
 
@@ -19,7 +18,6 @@ class DetailMovieViewController: UIViewController {
     @IBOutlet var posterImage: UIImageView!
     @IBOutlet var overviewLabel: UILabel!
     
-    private var cancellables = Set<AnyCancellable>()
     private var presenter: DetailMoviePresenter?
     var movieId = 0
     private var movie: DetailMovie?
@@ -28,19 +26,14 @@ class DetailMovieViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let detailUseCase = Injection.init().provideDetail()
+        let detailUseCase = Injection.init().provideMovie()
         presenter = DetailMoviePresenter(detailUseCase: detailUseCase)
         presenter?.getDetailMovie(id: movieId)
         
-        presenter?.objectWillChange
-            .sink { (_) in
-                DispatchQueue.main.async {
-                    if self.presenter?.loadingState == false {
-                        self.movie = self.presenter?.detailMovie
-                        self.setUI()
-                    }
-                }
-            }.store(in: &cancellables)
+        if self.presenter?.loadingState == false {
+            self.movie = self.presenter?.detailMovie
+            self.setUI()
+        }
     }
     
     private func setUI(){
