@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import Combine
 
 protocol TvUseCase {
-    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void)
+    func getTvs(type: TvType.RawValue) -> AnyPublisher<[Tv], Error>
+    func getDetailTv(id: Int) -> AnyPublisher<[DetailTv], Error>
 }
 
 class TvInteractor: TvUseCase {
@@ -19,10 +21,12 @@ class TvInteractor: TvUseCase {
         self.repository = repository
     }
     
-    func getTvs(type: TvType.RawValue, completion: @escaping (Result<[Tv], Error>) -> Void) {
-        repository.getTvs(type: type) { result in
-            completion(result)
-        }
+    func getTvs(type: TvType.RawValue) -> AnyPublisher<[Tv], Error> {
+        repository.getTvs(type: type)
+    }
+    
+    func getDetailTv(id: Int) -> AnyPublisher<[DetailTv], Error> {
+        repository.getDetailTv(id: id)
     }
 }
 

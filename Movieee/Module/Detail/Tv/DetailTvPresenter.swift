@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import Combine
 
 class DetailTvPresenter: ObservableObject {
-    let detailUseCase: DetailUseCase
+    let detailUseCase: TvUseCase
     
     enum State {
         case isLoading
@@ -16,35 +17,34 @@ class DetailTvPresenter: ObservableObject {
         case loaded
     }
     
-    
+    private var cancellables: Set<AnyCancellable> = []
     @Published var detailTv: DetailTv?
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
     
     @Published private(set) var state = State.isLoading
     
-    init(detailUseCase: DetailUseCase) {
+    init(detailUseCase: TvUseCase) {
         self.detailUseCase = detailUseCase
     }
     
     func getDetailTv(id: Int) {
         self.loadingState = true
         
-        detailUseCase.getDetailTv(id: id) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
+        detailUseCase.getDetailTv(id: id)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
                     self.loadingState = false
-                    self.detailTv = tv
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor \(self.errorMessage)")
+            }, receiveValue: { detailTv in
+                if (!detailTv.isEmpty){
+                    self.detailTv = detailTv.first
                 }
-            }
-        }
+            })
+            .store(in: &cancellables)
     }
 }

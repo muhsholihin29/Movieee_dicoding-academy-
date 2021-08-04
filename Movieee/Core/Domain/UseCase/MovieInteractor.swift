@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import Combine
 
 protocol MovieUseCase {
-    func getMovies(type: MovieType.RawValue, completion: @escaping (Result<[Movie], Error>) -> Void)
+    func getMovies(type: MovieType.RawValue) -> AnyPublisher<[Movie], Error>
+    func getDetailMovie(id: Int) -> AnyPublisher<[DetailMovie], Error>
 }
 
 class MovieInteractor: MovieUseCase {
@@ -19,10 +21,12 @@ class MovieInteractor: MovieUseCase {
         self.repository = repository
     }
     
-    func getMovies(type: MovieType.RawValue, completion: @escaping (Result<[Movie], Error>) -> Void) {
-        repository.getMovies(type: type) { result in
-            completion(result)
-        }
+    func getMovies(type: MovieType.RawValue) -> AnyPublisher<[Movie], Error> {
+        repository.getMovies(type: type) 
+    }
+    
+    func getDetailMovie(id: Int) -> AnyPublisher<[DetailMovie], Error> {
+        repository.getDetailMovie(id: id)
     }
 }
 

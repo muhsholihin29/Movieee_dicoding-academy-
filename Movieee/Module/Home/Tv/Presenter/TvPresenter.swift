@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class TvPresenter: ObservableObject {
     
@@ -17,7 +18,7 @@ class TvPresenter: ObservableObject {
         case loaded
     }
     
-    
+    private var cancellables: Set<AnyCancellable> = []
     @Published var tv = [[Tv]](repeating: [], count: 4)
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
@@ -31,74 +32,68 @@ class TvPresenter: ObservableObject {
     func getPopularTv() {
         self.loadingState = true
         
-        tvUseCase.getTvs(type: TvType.POPULAR.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.tv[0] = tv
-                    print("mytag \(tv[0].id)")
+        tvUseCase.getTvs(type: TvType.POPULAR.rawValue) .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
+                    self.loadingState = false
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+            }, receiveValue: { tv in
+                self.tv[0] = tv
+                
+            })
+            .store(in: &cancellables)
     }
     
     func getTopRatedTv() {
         self.loadingState = true
         
-        tvUseCase.getTvs(type: TvType.TOP_RATED.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.tv[1] = tv
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
+        tvUseCase.getTvs(type: TvType.TOP_RATED.rawValue) .sink(receiveCompletion: { completion in
+            switch completion {
+            case .failure:
+                self.errorMessage = String(describing: completion)
+            case .finished:
+                self.loadingState = false
             }
-        }
+        }, receiveValue: { tv in
+            self.tv[1] = tv
+            
+        })
+            .store(in: &cancellables)
     }
     
     func getAiringTodayTv() {
         
-        tvUseCase.getTvs(type: TvType.AIRING_TODAY.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.tv[2] = tv
+        tvUseCase.getTvs(type: TvType.AIRING_TODAY.rawValue)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
+                    self.loadingState = false
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+            }, receiveValue: { tv in
+                self.tv[2] = tv
+                
+            })
+            .store(in: &cancellables)
     }
     
     func getOnTheAirTv() {
         
-        tvUseCase.getTvs(type: TvType.ON_THE_AIR.rawValue) { result in
-            switch result {
-            case .success(let tv):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
-                    self.loadingState = false
-                    self.tv[3] = tv
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
+        tvUseCase.getTvs(type: TvType.ON_THE_AIR.rawValue) .sink(receiveCompletion: { completion in
+            switch completion {
+            case .failure:
+                self.errorMessage = String(describing: completion)
+            case .finished:
+                self.loadingState = false
             }
-        }
+        }, receiveValue: { tv in
+            self.tv[3] = tv
+            
+        })
+            .store(in: &cancellables)
     }
 }

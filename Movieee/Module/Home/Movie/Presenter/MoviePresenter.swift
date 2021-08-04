@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class MoviePresenter: ObservableObject {
     
@@ -17,7 +18,7 @@ class MoviePresenter: ObservableObject {
         case loaded
     }
     
-    
+    private var cancellables: Set<AnyCancellable> = []
     @Published var movies = [[Movie]](repeating: [], count: 4)
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
@@ -31,72 +32,71 @@ class MoviePresenter: ObservableObject {
     func getPopularMovies() {
         self.loadingState = true
         
-        movieUseCase.getMovies(type: MovieType.POPULAR.rawValue) { result in
-            switch result {
-            case .success(let movies):
-                DispatchQueue.main.async {
+        movieUseCase.getMovies(type: MovieType.POPULAR.rawValue)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
+                    self.loadingState = false
+                }
+            }, receiveValue: { movies in
                     self.movies[0] = movies
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+                
+            })
+            .store(in: &cancellables)
     }
     
     func getTopRatedMovies() {
         
-        movieUseCase.getMovies(type: MovieType.TOP_RATED.rawValue) { result in
-            switch result {
-            case .success(let movies):
-                DispatchQueue.main.async {
-                    self.movies[1] = movies
+        movieUseCase.getMovies(type: MovieType.TOP_RATED.rawValue)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
+                    self.loadingState = false
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+            }, receiveValue: { movies in
+                self.movies[1] = movies
+                
+            })
+            .store(in: &cancellables)
     }
     
     func getNowPlayingMovies() {
         
-        movieUseCase.getMovies(type: MovieType.NOW_PLAYING.rawValue) { result in
-            switch result {
-            case .success(let movies):
-                DispatchQueue.main.async {
-                    self.movies[2] = movies
+        movieUseCase.getMovies(type: MovieType.NOW_PLAYING.rawValue) .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
+                    self.loadingState = false
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+            }, receiveValue: { movies in
+                self.movies[2] = movies
+                
+            })
+            .store(in: &cancellables)
     }
     
     func getUpcomingMovies() {
         
-        movieUseCase.getMovies(type: MovieType.UPCOMING.rawValue) { result in
-            switch result {
-            case .success(let movies):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
+        movieUseCase.getMovies(type: MovieType.UPCOMING.rawValue) .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
                     self.loadingState = false
-                    self.movies[3] = movies 
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
-                }
-            }
-        }
+            }, receiveValue: { movies in
+                self.movies[3] = movies
+                
+            })
+            .store(in: &cancellables)
     }
 }

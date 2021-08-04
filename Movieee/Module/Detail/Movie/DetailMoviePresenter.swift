@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import Combine
 
 class DetailMoviePresenter: ObservableObject {
-    let detailUseCase: DetailUseCase
+    let detailUseCase: MovieUseCase
     
     enum State {
         case isLoading
@@ -16,35 +17,33 @@ class DetailMoviePresenter: ObservableObject {
         case loaded
     }
     
-    
+    private var cancellables: Set<AnyCancellable> = []
     @Published var detailMovie: DetailMovie?
     @Published var errorMessage: String = ""
     @Published var loadingState: Bool = true
     
     @Published private(set) var state = State.isLoading
     
-    init(detailUseCase: DetailUseCase) {
+    init(detailUseCase: MovieUseCase) {
         self.detailUseCase = detailUseCase
     }
     
     func getDetailMovie(id: Int) {
         self.loadingState = true
-        
-        detailUseCase.getDetailMovie(id: id) { result in
-            switch result {
-            case .success(let movie):
-                DispatchQueue.main.async {
-                    self.state = State.loaded
+        detailUseCase.getDetailMovie(id: id)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure:
+                    self.errorMessage = String(describing: completion)
+                case .finished:
                     self.loadingState = false
-                    self.detailMovie = movie
                 }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    self.loadingState = false
-                    self.errorMessage = error.localizedDescription
-                    print("errooor")
+            }, receiveValue: { detailMovie in
+                if (!detailMovie.isEmpty){
+                    self.detailMovie = detailMovie.first
                 }
-            }
-        }
+            })
+            .store(in: &cancellables)
     }
 }

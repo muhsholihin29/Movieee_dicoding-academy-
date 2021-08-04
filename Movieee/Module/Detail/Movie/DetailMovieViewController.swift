@@ -28,7 +28,7 @@ class DetailMovieViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let detailUseCase = Injection.init().provideDetail()
+        let detailUseCase = Injection.init().provideMovie()
         presenter = DetailMoviePresenter(detailUseCase: detailUseCase)
         presenter?.getDetailMovie(id: movieId)
         

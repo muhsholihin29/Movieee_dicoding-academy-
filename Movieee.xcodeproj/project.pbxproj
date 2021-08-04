@@ -14,7 +14,6 @@
 		CF40CB4726B6E27B008DDA1D /* MovieEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF40CB4626B6E27B008DDA1D /* MovieEntity.swift */; };
 		CF40CB4926B6E28F008DDA1D /* LocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF40CB4826B6E28F008DDA1D /* LocalDataSource.swift */; };
 		CF5B9D2F26B024E800E8F27C /* Injection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D2E26B024E800E8F27C /* Injection.swift */; };
-		CF5B9D3126B0251300E8F27C /* DetailInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3026B0251300E8F27C /* DetailInteractor.swift */; };
 		CF5B9D3426B02A4D00E8F27C /* MovieViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3326B02A4D00E8F27C /* MovieViewController.swift */; };
 		CF5B9D3826B0428000E8F27C /* MoviePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3726B0428000E8F27C /* MoviePresenter.swift */; };
 		CF5B9D3D26B0662E00E8F27C /* TvInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B9D3C26B0662E00E8F27C /* TvInteractor.swift */; };
@@ -82,7 +81,6 @@
 		CF40CB4626B6E27B008DDA1D /* MovieEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieEntity.swift; sourceTree = "<group>"; };
 		CF40CB4826B6E28F008DDA1D /* LocalDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalDataSource.swift; sourceTree = "<group>"; };
 		CF5B9D2E26B024E800E8F27C /* Injection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Injection.swift; sourceTree = "<group>"; };
-		CF5B9D3026B0251300E8F27C /* DetailInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailInteractor.swift; sourceTree = "<group>"; };
 		CF5B9D3326B02A4D00E8F27C /* MovieViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieViewController.swift; sourceTree = "<group>"; };
 		CF5B9D3726B0428000E8F27C /* MoviePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviePresenter.swift; sourceTree = "<group>"; };
 		CF5B9D3C26B0662E00E8F27C /* TvInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TvInteractor.swift; sourceTree = "<group>"; };
@@ -360,7 +358,6 @@
 			isa = PBXGroup;
 			children = (
 				CFB6AC8526AF8623005237CC /* MovieInteractor.swift */,
-				CF5B9D3026B0251300E8F27C /* DetailInteractor.swift */,
 				CF5B9D3C26B0662E00E8F27C /* TvInteractor.swift */,
 			);
 			path = UseCase;
@@ -642,7 +639,6 @@
 				CF8B925C269B0C03009A39D8 /* AppDelegate.swift in Sources */,
 				CFB6AC8A26AF991E005237CC /* DetailTvResponse.swift in Sources */,
 				CFB6AC8E26AFBFFA005237CC /* DetailMovie.swift in Sources */,
-				CF5B9D3126B0251300E8F27C /* DetailInteractor.swift in Sources */,
 				CFB6AC8C26AFBFDC005237CC /* DetailTv.swift in Sources */,
 				CF9F68AB26AEED04002599C5 /* Movie.swift in Sources */,
 				CF9F68A926AEEC36002599C5 /* DataMapper.swift in Sources */,

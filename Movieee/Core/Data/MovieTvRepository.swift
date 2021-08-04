@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import Combine
 
 protocol MovieTvRepositoryProtocol {
-    func getMovies(type: MovieType.RawValue, result: @escaping (Result<[Movie], Error>) -> Void)
-    func getDetailMovie(id: Int, result: @escaping (Result<DetailMovie, Error>) -> Void)
+    func getMovies(type: MovieType.RawValue) -> AnyPublisher<[Movie], Error>
+    func getDetailMovie(id: Int) -> AnyPublisher<[DetailMovie], Error>
     
-    func getTvs(type: TvType.RawValue, result: @escaping (Result<[Tv], Error>) -> Void)
-    func getDetailTv(id: Int, result: @escaping (Result<DetailTv, Error>) -> Void)
+    func getTvs(type: TvType.RawValue) -> AnyPublisher<[Tv], Error>
+    func getDetailTv(id: Int) -> AnyPublisher<[DetailTv], Error>
 }
 
 final class MovieTvRepository: NSObject {
@@ -33,167 +34,84 @@ final class MovieTvRepository: NSObject {
 
 extension MovieTvRepository: MovieTvRepositoryProtocol {
     
-    func getMovies(type: MovieType.RawValue, result: @escaping (Result<[Movie], Error>) -> Void){
-        local.getMovies(type: type) { localeResponses in
-            switch localeResponses {
-            case .success(let movieEntity):
-                let movieList = DataMapper.mapMovieEntityToDomain(input: movieEntity)
-                if movieList.isEmpty {
-                    self.remote.getMovies(type: type) { remoteResponses in
-                        switch remoteResponses {
-                        case .success(let movieResponses):
-                            let movieEntities = DataMapper.mapMovieResponseToEntity(input: movieResponses)
-                            self.local.addMovies(movies: movieEntities, type: type) { addState in
-                                switch addState {
-                                case .success(let resultFromAdd):
-                                    if resultFromAdd {
-                                        self.local.getMovies(type: type) { localeResponses in
-                                            switch localeResponses {
-                                            case .success(let movieEntity):
-                                                let resultList = DataMapper.mapMovieEntityToDomain(input: movieEntity)
-                                                result(.success(resultList))
-                                            case .failure(let error):
-                                                result(.failure(error))
-                                            }
-                                        }
-                                    }
-                                case .failure(let error):
-                                    result(.failure(error))
-                                }
-                            }
-                        case .failure(let error):
-                            result(.failure(error))
+    func getMovies(type: MovieType.RawValue) -> AnyPublisher<[Movie], Error> {
+        return self.local.getMovies(type: type)
+            .flatMap { result -> AnyPublisher<[Movie], Error> in
+                if result.isEmpty {
+                    return self.remote.getMovies(type: type)
+                        .map { DataMapper.mapMovieResponseToEntity(input: $0) }
+                        .flatMap { self.local.addMovies(movies: $0, type: type) }
+                        .filter { $0 }
+                        .flatMap { _ in self.local.getMovies(type: type)
+                        .map { DataMapper.mapMovieEntityToDomain(input: $0) }
                         }
-                    }
+                        .eraseToAnyPublisher()
                 } else {
-                    result(.success(movieList))
+                    return self.local.getMovies(type: type)
+                        .map { DataMapper.mapMovieEntityToDomain(input: $0) }
+                        .eraseToAnyPublisher()
                 }
-            case .failure(let error):
-                result(.failure(error))
-            }
-        }
+            }.eraseToAnyPublisher()
     }
     
-    func getDetailMovie(id: Int, result: @escaping (Result<DetailMovie, Error>) -> Void){
-        local.getDetailMovie(id: id) { localeResponses in
-            switch localeResponses {
-            case .success(let detailMovieEntity):
-                if detailMovieEntity.isEmpty {
-                    self.remote.getDetailMovie(id: id) { remoteResponses in
-                        switch remoteResponses {
-                        case .success(let detailMovieResponse):
-                            let detailMovieEntity = DataMapper.mapDetailMovieResponseToEntity(input: detailMovieResponse)
-                            self.local.addDetailMovie(movie: detailMovieEntity) { addState in
-                                switch addState {
-                                case .success(let resultFromAdd):
-                                    if resultFromAdd {
-                                        self.local.getDetailMovie(id: id) { localeResponses in
-                                            switch localeResponses {
-                                            case .success(let movieEntity):
-                                                let resultList = DataMapper.mapDetailMovieEntityToDomain(input: movieEntity[0])
-                                                result(.success(resultList))
-                                            case .failure(let error):
-                                                result(.failure(error))
-                                            }
-                                        }
-                                    }
-                                case .failure(let error):
-                                    result(.failure(error))
-                                }
-                            }
-                        case .failure(let error):
-                            result(.failure(error))
+    func getDetailMovie(id: Int) -> AnyPublisher<[DetailMovie], Error> {
+        
+        return self.local.getDetailMovie(id: id)
+            .flatMap { result -> AnyPublisher<[DetailMovie], Error> in
+                if result.isEmpty {
+                    return self.remote.getDetailMovie(id: id)
+                        .map { DataMapper.mapDetailMovieResponseToEntity(input: $0) }
+                        .flatMap { self.local.addDetailMovie(movie: $0) }
+                        .filter { $0 }
+                        .flatMap { _ in self.local.getDetailMovie(id: id)
+                            .map { [DataMapper.mapDetailMovieEntityToDomain(input: $0[0])] }
                         }
-                    }
+                        .eraseToAnyPublisher()
                 } else {
-                    let movieList = DataMapper.mapDetailMovieEntityToDomain(input: detailMovieEntity[0])
-                    result(.success(movieList))
+                    return self.local.getDetailMovie(id: id)
+                        .map { [DataMapper.mapDetailMovieEntityToDomain(input: $0[0])] }
+                        .eraseToAnyPublisher()
                 }
-            case .failure(let error):
-                result(.failure(error))
-            }
-        }
+            }.eraseToAnyPublisher()
     }
     
-    func getTvs(type: TvType.RawValue, result: @escaping (Result<[Tv], Error>) -> Void){
-        local.getTvs(type: type) { localeResponses in
-            switch localeResponses {
-            case .success(let tvEntity):
-                let movieList = DataMapper.mapTvEntityToDomain(input: tvEntity)
-                if movieList.isEmpty {
-                    self.remote.getTvs(type: type) { remoteResponses in
-                        switch remoteResponses {
-                        case .success(let tvResponses):
-                            let tvEntities = DataMapper.mapTvResponseToEntity(input: tvResponses)
-                            self.local.addTvs(tvs: tvEntities, type: type) { addState in
-                                switch addState {
-                                case .success(let resultFromAdd):
-                                    if resultFromAdd {
-                                        self.local.getTvs(type: type) { localeResponses in
-                                            switch localeResponses {
-                                            case .success(let tvEntity):
-                                                let resultList = DataMapper.mapTvEntityToDomain(input: tvEntity)
-                                                result(.success(resultList))
-                                            case .failure(let error):
-                                                result(.failure(error))
-                                            }
-                                        }
-                                    }
-                                case .failure(let error):
-                                    result(.failure(error))
-                                }
-                            }
-                        case .failure(let error):
-                            result(.failure(error))
+    func getTvs(type: TvType.RawValue) -> AnyPublisher<[Tv], Error> {
+        return self.local.getTvs(type: type)
+            .flatMap { result -> AnyPublisher<[Tv], Error> in
+                if result.isEmpty {
+                    return self.remote.getTvs(type: type)
+                        .map { DataMapper.mapTvResponseToEntity(input: $0) }
+                        .flatMap { self.local.addTvs(tvs: $0, type: type) }
+                        .filter { $0 }
+                        .flatMap { _ in self.local.getTvs(type: type)
+                        .map { DataMapper.mapTvEntityToDomain(input: $0) }
                         }
-                    }
+                        .eraseToAnyPublisher()
                 } else {
-                    result(.success(movieList))
+                    return self.local.getTvs(type: type)
+                        .map { DataMapper.mapTvEntityToDomain(input: $0) }
+                        .eraseToAnyPublisher()
                 }
-            case .failure(let error):
-                result(.failure(error))
-            }
-        }
+            }.eraseToAnyPublisher()
     }
     
-    func getDetailTv(id: Int, result: @escaping (Result<DetailTv, Error>) -> Void){
-        local.getDetailTv(id: id) { localeResponses in
-            switch localeResponses {
-            case .success(let detailTvEntity):
-                if detailTvEntity.isEmpty {
-                    self.remote.getDetailTv(id: id) { remoteResponses in
-                        switch remoteResponses {
-                        case .success(let detailTvResponse):
-                            let detailTvEntity = DataMapper.mapDetailTvResponseToEntity(input: detailTvResponse)
-                            self.local.addDetailTv(tv: detailTvEntity) { addState in
-                                switch addState {
-                                case .success(let resultFromAdd):
-                                    if resultFromAdd {
-                                        self.local.getDetailTv(id: id) { localeResponses in
-                                            switch localeResponses {
-                                            case .success(let tvEntity):
-                                                let resultList = DataMapper.mapDetailTvEntityToDomain(input: tvEntity[0])
-                                                result(.success(resultList))
-                                            case .failure(let error):
-                                                result(.failure(error))
-                                            }
-                                        }
-                                    }
-                                case .failure(let error):
-                                    result(.failure(error))
-                                }
-                            }
-                        case .failure(let error):
-                            result(.failure(error))
+    func getDetailTv(id: Int) -> AnyPublisher<[DetailTv], Error> {
+        return self.local.getDetailTv(id: id)
+            .flatMap { result -> AnyPublisher<[DetailTv], Error> in
+                if result.isEmpty {
+                    return self.remote.getDetailTv(id: id)
+                        .map { DataMapper.mapDetailTvResponseToEntity(input: $0) }
+                        .flatMap { self.local.addDetailTv(tv: $0) }
+                        .filter { $0 }
+                        .flatMap { _ in self.local.getDetailTv(id: id)
+                        .map { [DataMapper.mapDetailTvEntityToDomain(input: $0[0])] }
                         }
-                    }
+                        .eraseToAnyPublisher()
                 } else {
-                    let movieList = DataMapper.mapDetailTvEntityToDomain(input: detailTvEntity[0])
-                    result(.success(movieList))
+                    return self.local.getDetailTv(id: id)
+                        .map { [DataMapper.mapDetailTvEntityToDomain(input: $0[0])] }
+                        .eraseToAnyPublisher()
                 }
-            case .failure(let error):
-                result(.failure(error))
-            }
-        }
+            }.eraseToAnyPublisher()
     }
 }

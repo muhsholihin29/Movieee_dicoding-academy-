@@ -29,7 +29,7 @@ class DetailTvViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let detailUseCase = Injection.init().provideDetail()
+        let detailUseCase = Injection.init().provideTv()
         presenter = DetailTvPresenter(detailUseCase: detailUseCase)
         presenter?.getDetailTv(id: tvId)
         
